@@ -1,5 +1,3 @@
-# still with bugs (especially dimensions)
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -29,7 +27,7 @@ C = np.ones([dim_of_system,1])  #the measurement is of the state
 D = 0
 
 x = -0.37727 # truth value (typo in example at top of p. 13 calls this z)
-z = np.random.normal(x,0.1,size=[dim_of_system]) # observations (normal about x, sigma=0.1)
+z = np.random.normal(x,0.1,size=[n_iter,dim_of_system]) # observations (normal about x, sigma=0.1)
 Q = (1e-5)*np.ones([dim_of_system]) # process variance
 R = (0.1**2)*np.ones([dim_of_system]) # estimate of measurement variance, change to see effect
 
@@ -51,7 +49,8 @@ for k in range(1,n_iter):
     P_minus[k] = P[k-1] + Q
 
     # measurement update
-    K[k] = P_minus[k]*np.linalg.inv(P_minus[k]+R)
+    # K[k] = P_minus[k]*np.linalg.inv(P_minus[k]+R) #if dim_of_system<1 use this line instead of the following
+    K[k] = P_minus[k] * 1/(P_minus[k] + R)
     x_hat[k] = x_hat_minus[k] + K[k]*(z[k]-x_hat_minus[k])
     P[k] = ( np.ones([dim_of_system])  - K[k])*P_minus[k]
 
