@@ -1,17 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-plt.rcParams['figure.figsize'] = (10, 8)
-
 
 '''
-we assume the process is governed by the linear difference equations:
+This implementation is partly based on "An Introduction to the Kalman Filter" by Greg Welch and Gary Bishop,
+and on the python implementation by Andrew D. Straw (especially the plotting part).
+We assume the process is governed by the linear difference equations:
 x(k) = A*x(k-1) + B*u(k-1) + w(k)
 z(k) = C*x(k) + D(k) + v(k) 
 '''
 
 # parameters
-n_iter = 200    #number of iterations
+n_iter = 200   #number of iterations
 dim_of_system = 1
 A = np.zeros([dim_of_system,dim_of_system])
 B = np.zeros([1,dim_of_system])
@@ -31,7 +31,7 @@ z = np.random.normal(x,0.1,size=[n_iter,dim_of_system]) # observations (normal a
 Q = (1e-5)*np.ones([dim_of_system]) # process variance
 R = (0.1**2)*np.ones([dim_of_system]) # estimate of measurement variance, change to see effect
 
-#ALLOCATING ARRAY SPACES
+# allocating array spaces
 x_hat = np.zeros([n_iter,dim_of_system])
 x_hat_minus = np.zeros([n_iter,dim_of_system])
 P = np.zeros([n_iter,dim_of_system])
@@ -49,7 +49,6 @@ for k in range(1,n_iter):
     P_minus[k] = P[k-1] + Q
 
     # measurement update
-    # K[k] = P_minus[k]*np.linalg.inv(P_minus[k]+R) #if dim_of_system<1 use this line instead of the following
     K[k] = P_minus[k] * 1/(P_minus[k] + R)
     x_hat[k] = x_hat_minus[k] + K[k]*(z[k]-x_hat_minus[k])
     P[k] = ( np.ones([dim_of_system])  - K[k])*P_minus[k]
